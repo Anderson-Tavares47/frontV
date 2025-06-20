@@ -1,53 +1,51 @@
 'use client'
-export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { jwtDecode } from 'jwt-decode';
-import { FaBars, FaChevronDown } from 'react-icons/fa';
-import Image from 'next/image';
-import Logo from '../../assets/img/renato lyra_marca.png';
-import ListaSolicitante from '../../components/listaSolicitante/ListaSolicitante';
-import ListaDemandas from '../../components/listaDemandas/ListaDemandas';
-import AdminPage from '../../components/adm/Admin';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { jwtDecode } from 'jwt-decode'
+import { FaBars, FaChevronDown } from 'react-icons/fa'
+import Logo from '../../assets/img/renato lyra_marca.png'
+import Image from 'next/image'
+import ListaSolicitante from '../../components/listaSolicitante/ListaSolicitante'
+import ListaDemandas from '../../components/listaDemandas/ListaDemandas'
+import AdminPage from '../../components/adm/Admin'
 
 export default function DashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [activePage, setActivePage] = useState('Lista Demandas');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loadingToken, setLoadingToken] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [adminOpen, setAdminOpen] = useState(false)
+  const [activePage, setActivePage] = useState('Lista Demandas')
+  const [isAdmin, setIsAdmin] = useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
 
     if (!token) {
-      router.push('/');
-      return;
+      router.push('/')
+      return
     }
 
     try {
-      const decoded: any = jwtDecode(token);
-      setIsAdmin(!!decoded?.adm);
+      const decoded: any = jwtDecode(token)
+      if (!decoded || !decoded.adm) {
+        setIsAdmin(false)
+      } else {
+        setIsAdmin(true)
+      }
     } catch (err) {
-      console.error('Erro ao decodificar token:', err);
-      router.push('/');
-    } finally {
-      setLoadingToken(false);
+      console.error('Erro ao decodificar token:', err)
+      router.push('/')
     }
-  }, []);
+  }, [])
 
-  if (loadingToken) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600 text-sm">Verificando sessão...</p>
-      </div>
-    );
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('solicitante') // se usado
+    router.push('/')
   }
 
-  const menuItems = ['Lista Demandas', 'Lista Solicitantes'];
+  const menuItems = ['Lista Demandas', 'Lista Solicitantes']
 
   return (
     <div className="flex min-h-screen">
@@ -117,6 +115,14 @@ export default function DashboardPage() {
             <FaBars size={20} />
           </button>
           <h1 className="text-lg font-semibold text-[#17686f]">Dashboard</h1>
+
+          {/* Botão de logout */}
+          <button
+            onClick={handleLogout}
+            className="ml-auto bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            Sair
+          </button>
         </header>
 
         {/* Page content */}
@@ -130,5 +136,5 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
-  );
+  )
 }

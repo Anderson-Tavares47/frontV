@@ -12,7 +12,7 @@ interface CadastroDemandaProps {
 }
 
 
-export default function NovaDemandaPage({ setShowCreateForm, editData }: CadastroDemandaProps) {
+export default function NovaDemandaPage({ setShowCreateForm, editData, onDemandaCadastrada }: CadastroDemandaProps) {
   const [focusedSelect, setFocusedSelect] = useState('')
   const [obs, setObs] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
@@ -56,7 +56,7 @@ function getCurrentDate() {
     const userId = decoded?.id
     const adm = decoded?.adm === true
     setIsAdmin(adm)
-    
+
     if (editData) {
       setForm({
         protocolo: editData.protocolo || '',
@@ -114,6 +114,11 @@ function getCurrentDate() {
             : form.status,
       }
       await registrarDemanda(payload, token, isAdmin)
+
+      if (onDemandaCadastrada) {
+      await onDemandaCadastrada()
+    } 
+
       setShowCreateForm(false)
     } catch (error) {
       alert('Erro ao registrar a demanda.')

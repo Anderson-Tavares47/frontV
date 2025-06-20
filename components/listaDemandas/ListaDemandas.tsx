@@ -61,18 +61,18 @@ export default function ListaDemandas() {
       const solicitante = item.solicitantes?.solicitante?.toLowerCase() || ''
       const searchMatch = nome.includes(search.toLowerCase()) || solicitante.includes(search.toLowerCase())
       const statusMatch = statusFilter === 'Todos' || item.status === statusFilter
-      
+
       // Filtro por período
       let dateMatch = true
       if (dateRange.start || dateRange.end) {
         const itemDate = new Date(item.dataSolicitacao)
         const startDate = dateRange.start ? new Date(dateRange.start) : null
         const endDate = dateRange.end ? new Date(dateRange.end) : null
-        
+
         if (startDate) dateMatch = dateMatch && itemDate >= startDate
         if (endDate) dateMatch = dateMatch && itemDate <= endDate
       }
-      
+
       return searchMatch && statusMatch && dateMatch
     })
 
@@ -125,37 +125,37 @@ export default function ListaDemandas() {
   }
 
   // Exportar para PDF
-const exportToPDF = () => {
-  const doc = new jsPDF()
-  const title = 'Relatório de Demandas'
-  
-  doc.setFontSize(16)
-  doc.text(title, 14, 15)
-  
-  const headers = [['Protocolo', 'Nome', 'Contato', 'Prioridade', 'Status', 'Data Solicitação']]
-  const data = filteredData.map(item => [
-    item.protocolo,
-    item.solicitantes?.nomeCompleto || '-',
-    item.solicitantes?.telefoneContato || '-',
-    item.prioridade,
-    item.status,
-    item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'
-  ])
+  const exportToPDF = () => {
+    const doc = new jsPDF()
+    const title = 'Relatório de Demandas'
 
-  // Configuração com tipagem correta
-  const tableConfig: UserOptions = {
-    head: headers,
-    body: data,
-    startY: 20,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [28, 125, 135]
+    doc.setFontSize(16)
+    doc.text(title, 14, 15)
+
+    const headers = [['Protocolo', 'Nome', 'Contato', 'Prioridade', 'Status', 'Data Solicitação']]
+    const data = filteredData.map(item => [
+      item.protocolo,
+      item.solicitantes?.nomeCompleto || '-',
+      item.solicitantes?.telefoneContato || '-',
+      item.prioridade,
+      item.status,
+      item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'
+    ])
+
+    // Configuração com tipagem correta
+    const tableConfig: UserOptions = {
+      head: headers,
+      body: data,
+      startY: 20,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [28, 125, 135]
+      }
     }
-  }
 
-  autoTable(doc, tableConfig)
-  doc.save('demandas.pdf')
-}
+    autoTable(doc, tableConfig)
+    doc.save('demandas.pdf')
+  }
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE)
   const paginatedData = filteredData.slice(
@@ -164,7 +164,7 @@ const exportToPDF = () => {
   )
 
   if (showCreateForm) {
-    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} onDemandaCadastrada={loadData}/>
+    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} onDemandaCadastrada={loadData} />
   }
 
   return (
@@ -211,7 +211,7 @@ const exportToPDF = () => {
             <input
               type="date"
               value={dateRange.start}
-              onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
               className="border border-[#007cb2] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] w-full"
               placeholder="Data inicial"
             />
@@ -219,7 +219,7 @@ const exportToPDF = () => {
             <input
               type="date"
               value={dateRange.end}
-              onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
               className="border border-[#007cb2] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] w-full"
               placeholder="Data final"
             />
@@ -245,12 +245,15 @@ const exportToPDF = () => {
           >
             <FaFilePdf /> PDF
           </button>
-          <button
-            onClick={handleNew}
-            className="bg-[#007cb2] text-white px-6 py-2 rounded hover:bg-[#00689c] transition"
-          >
-            Novo
-          </button>
+          {!isAdmin2 && (
+            <button
+              onClick={handleNew}
+              className="bg-[#007cb2] text-white px-6 py-2 rounded hover:bg-[#00689c] transition"
+            >
+              Novo
+            </button>
+          )}
+
         </div>
       </div>
 

@@ -20,12 +20,12 @@ export default function LoginPage() {
     try {
       const response = await loginSolicitante({ email, senha: password })
 
-      if (!response.token) {
-        throw new Error('Token não recebido do servidor.')
-      }
+      // if (!response.token) {
+      //   throw new Error('Token não recebido do servidor.')
+      // }
 
       localStorage.setItem('token', response.token)
-      localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
+      // localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
 
       router.push('/dashboard')
     } catch (err) {

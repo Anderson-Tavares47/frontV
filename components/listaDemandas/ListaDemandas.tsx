@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import CadastroDemanda from '../cadastroDemanda/CadastroDemanda'
-import { FaChevronDown } from 'react-icons/fa'
+import { FaChevronDown, FaFileExcel, FaFilePdf } from 'react-icons/fa'
 import { getTodasDemandas, excluirDemanda } from './action'
 import { getToken, parseJwt } from '../../utils/auth'
+import { utils, writeFile } from 'xlsx'
+import { jsPDF } from 'jspdf'
+import autoTable, { UserOptions } from 'jspdf-autotable'
 
 const ITEMS_PER_PAGE = 20
 
 export default function ListaDemandas() {
   const [search, setSearch] = useState('')
-  const [date, setDate] = useState('')
+  const [dateRange, setDateRange] = useState({ start: '', end: '' })
   const [statusFilter, setStatusFilter] = useState('Todos')
   const [allData, setAllData] = useState<any[]>([])
   const [filteredData, setFilteredData] = useState<any[]>([])
@@ -23,10 +26,9 @@ export default function ListaDemandas() {
   const token = getToken()
 
   if (!token) {
-    console.error('Sessão expirada. Faça login novamente.');
-    return;
+    console.error('Sessão expirada. Faça login novamente.')
+    return
   }
-
 
   const loadData = async () => {
     try {
@@ -36,12 +38,11 @@ export default function ListaDemandas() {
       const isAdmin = decoded?.adm === true
 
       if (!token) {
-        console.error('Sessão expirada. Faça login novamente.');
-        return;
+        alert('Sessão expirada. Faça login novamente.')
+        return
       }
 
       setIsAdmin(isAdmin)
-
       const res = await getTodasDemandas(id, isAdmin, token)
       setAllData(res)
       setFilteredData(res)
@@ -60,17 +61,28 @@ export default function ListaDemandas() {
       const solicitante = item.solicitantes?.solicitante?.toLowerCase() || ''
       const searchMatch = nome.includes(search.toLowerCase()) || solicitante.includes(search.toLowerCase())
       const statusMatch = statusFilter === 'Todos' || item.status === statusFilter
-      const dateMatch = !date || item.dataSolicitacao?.startsWith(date)
+      
+      // Filtro por período
+      let dateMatch = true
+      if (dateRange.start || dateRange.end) {
+        const itemDate = new Date(item.dataSolicitacao)
+        const startDate = dateRange.start ? new Date(dateRange.start) : null
+        const endDate = dateRange.end ? new Date(dateRange.end) : null
+        
+        if (startDate) dateMatch = dateMatch && itemDate >= startDate
+        if (endDate) dateMatch = dateMatch && itemDate <= endDate
+      }
+      
       return searchMatch && statusMatch && dateMatch
     })
 
     setFilteredData(filtered)
     setCurrentPage(1)
-  }, [search, statusFilter, date, allData])
+  }, [search, statusFilter, dateRange, allData])
 
   const handleClear = () => {
     setSearch('')
-    setDate('')
+    setDateRange({ start: '', end: '' })
     setStatusFilter('Todos')
     setFilteredData(allData)
     setCurrentPage(1)
@@ -93,6 +105,58 @@ export default function ListaDemandas() {
     }
   }
 
+  // Exportar para Excel
+  const exportToExcel = () => {
+    const dataToExport = filteredData.map(item => ({
+      Protocolo: item.protocolo,
+      Nome: item.solicitantes?.nomeCompleto || '-',
+      Contato: item.solicitantes?.telefoneContato || '-',
+      Prioridade: item.prioridade,
+      Status: item.status,
+      'Data Solicitação': item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-',
+      Setor: item.setor || '-',
+      'Meio de Solicitação': item.meioSolicitacao || '-'
+    }))
+
+    const worksheet = utils.json_to_sheet(dataToExport)
+    const workbook = utils.book_new()
+    utils.book_append_sheet(workbook, worksheet, 'Demandas')
+    writeFile(workbook, 'demandas.xlsx')
+  }
+
+  // Exportar para PDF
+const exportToPDF = () => {
+  const doc = new jsPDF()
+  const title = 'Relatório de Demandas'
+  
+  doc.setFontSize(16)
+  doc.text(title, 14, 15)
+  
+  const headers = [['Protocolo', 'Nome', 'Contato', 'Prioridade', 'Status', 'Data Solicitação']]
+  const data = filteredData.map(item => [
+    item.protocolo,
+    item.solicitantes?.nomeCompleto || '-',
+    item.solicitantes?.telefoneContato || '-',
+    item.prioridade,
+    item.status,
+    item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'
+  ])
+
+  // Configuração com tipagem correta
+  const tableConfig: UserOptions = {
+    head: headers,
+    body: data,
+    startY: 20,
+    theme: 'grid',
+    headStyles: {
+      fillColor: [28, 125, 135]
+    }
+  }
+
+  autoTable(doc, tableConfig)
+  doc.save('demandas.pdf')
+}
+
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE)
   const paginatedData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -100,7 +164,7 @@ export default function ListaDemandas() {
   )
 
   if (showCreateForm) {
-    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} onDemandaCadastrada={loadData} />
+    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} onDemandaCadastrada={loadData}/>
   }
 
   return (
@@ -113,7 +177,6 @@ export default function ListaDemandas() {
           </span>
         )}
       </div>
-
 
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
@@ -144,12 +207,23 @@ export default function ListaDemandas() {
             />
           </div>
 
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="border border-[#007cb2] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] w-full lg:w-48"
-          />
+          <div className="flex gap-2 w-full lg:w-auto">
+            <input
+              type="date"
+              value={dateRange.start}
+              onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+              className="border border-[#007cb2] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] w-full"
+              placeholder="Data inicial"
+            />
+            <span className="flex items-center">a</span>
+            <input
+              type="date"
+              value={dateRange.end}
+              onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+              className="border border-[#007cb2] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] w-full"
+              placeholder="Data final"
+            />
+          </div>
         </div>
 
         <div className="flex gap-2">
@@ -158,6 +232,18 @@ export default function ListaDemandas() {
             className="bg-gray-100 border border-gray-300 text-gray-800 px-5 py-2 rounded hover:bg-gray-200 transition"
           >
             Limpar
+          </button>
+          <button
+            onClick={exportToExcel}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition flex items-center gap-2"
+          >
+            <FaFileExcel /> Excel
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition flex items-center gap-2"
+          >
+            <FaFilePdf /> PDF
           </button>
           <button
             onClick={handleNew}

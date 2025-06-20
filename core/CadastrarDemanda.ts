@@ -60,3 +60,28 @@ export async function getProximoProtocolo(token: string) {
     throw err
   }
 }
+
+
+export async function editarDemanda(data: any, token: string) {
+  try {
+    const response = await fetch(`${BASE_URL}/demandas/${data.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const msg = await response.text();
+      console.error('Erro no response:', msg);
+      throw new Error('Erro ao editar demanda');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Erro ao editar demanda:', error);
+    throw error;
+  }
+}

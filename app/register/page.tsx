@@ -40,7 +40,7 @@ export default function RegistroPage() {
 
         setErrors([]);
         try {
-        //     const token = getToken();
+            const token = getToken();
 
         //     if (!token) {
         //         alert('Você precisa estar logado para registrar um solicitante.');

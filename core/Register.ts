@@ -32,13 +32,12 @@ interface LoginResponse {
   token: string
 }
 
-export async function registrarSolicitante(data: SolicitanteData, token: string): Promise<LoginResponse> {
+export async function registrarSolicitante(data: SolicitanteData): Promise<LoginResponse> {
   try {
     const response = await fetch(`${BASE_URL}/solicitantes/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data),
     });
@@ -77,13 +76,12 @@ export async function loginSolicitante({
   }
 }
 
-export async function updateSolicitante(id: number, data: any, token: string) {
+export async function updateSolicitante(id: number, data: any) {
   try {
     const response = await fetch(`${BASE_URL}/solicitantes/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });

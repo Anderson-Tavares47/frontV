@@ -36,7 +36,7 @@ export default function ListaDemandas() {
       const isAdmin = decoded?.adm === true
 
       if (!token) {
-        alert('Sessão expirada. Faça login novamente.');
+        console.error('Sessão expirada. Faça login novamente.');
         return;
       }
 

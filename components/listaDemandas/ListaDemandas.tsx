@@ -100,7 +100,7 @@ export default function ListaDemandas() {
   )
 
   if (showCreateForm) {
-    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} />
+    return <CadastroDemanda setShowCreateForm={setShowCreateForm} editData={editData} onDemandaCadastrada={loadData} />
   }
 
   return (

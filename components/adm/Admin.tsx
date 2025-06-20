@@ -153,12 +153,6 @@ export default function AdminPage() {
                                             Editar
                                         </button>
                                         <button
-                                            onClick={() => handleResetPassword(user)}
-                                            className="text-yellow-600 hover:underline"
-                                        >
-                                            Recuperar Senha
-                                        </button>
-                                        <button
                                             onClick={() => handleDelete(user.id)}
                                             className="text-red-600 hover:underline"
                                         >

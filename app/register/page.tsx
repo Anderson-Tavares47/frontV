@@ -40,12 +40,12 @@ export default function RegistroPage() {
 
         setErrors([]);
         try {
-            const token = getToken();
+        //     const token = getToken();
 
-            if (!token) {
-                alert('Você precisa estar logado para registrar um solicitante.');
-                return;
-            }
+        //     if (!token) {
+        //         alert('Você precisa estar logado para registrar um solicitante.');
+        //         return;
+        //     }
             const resposta = await registrarSolicitante({
                 nomeCompleto: form.nome,
                 cpf: form.cpf,
@@ -60,7 +60,7 @@ export default function RegistroPage() {
                 pontoReferencia: form.pontoReferencia,
                 secaoEleitoral: form.secao,
                 senha: form.senha
-            }, token);
+            });
 
             window.location.href = "/"
         } catch (err) {

@@ -74,21 +74,18 @@ export async function loginSolicitante({
     });
 
     const json = await response.json();
-
+    
     if (!response.ok) {
-      // Captura o erro corretamente para o front
-      const message = json?.message || json?.error || 'Erro ao fazer login';
-      throw new Error(message);
+      // Padronize a mensagem de erro
+      const errorMessage = json.message || json.error || 'Credenciais inválidas';
+      throw new Error(errorMessage);
     }
-
-    return {
-      message: json.message,
-      token: json.token,
-      solicitante: json.usuario // ← o frontend espera "solicitante"
-    };
+    
+    return json;
   } catch (err: any) {
-    console.error('[CORE] Erro no loginSolicitante:', err.message);
-    throw new Error(err.message || 'Erro desconhecido no login');
+    console.error('Erro no login:', err.message);
+    // Garanta que sempre tenha uma mensagem de erro amigável
+    throw new Error(err.message || 'Erro ao fazer login. Tente novamente.');
   }
 }
 

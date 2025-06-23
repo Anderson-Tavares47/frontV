@@ -8,31 +8,31 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert('Preencha todos os campos!')
+      setErrorMessage('Preencha todos os campos!')
       return
     }
 
     setLoading(true)
+    setErrorMessage('')
+
     try {
       const response = await loginSolicitante({ email, senha: password })
 
-      // if (!response.token) {
-      //   throw new Error('Token não recebido do servidor.')
-      // }
-
       localStorage.setItem('token', response.token)
-      // localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
+      localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
 
       router.push('/dashboard')
-    } catch (err) {
-      if (err instanceof Error) {
-        alert(`Erro: ${err.message}`)
+    } catch (err: any) {
+      setPassword('') // limpa a senha ao errar
+      if (err?.message) {
+        setErrorMessage(err.message)
       } else {
-        alert('Erro desconhecido ao tentar login.')
+        setErrorMessage('Erro ao tentar login. Verifique suas credenciais.')
       }
     } finally {
       setLoading(false)
@@ -41,6 +41,10 @@ export default function LoginPage() {
 
   const handleRegisterRedirect = () => {
     window.location.href = '/register'
+  }
+
+  const handleForgotPassword = () => {
+    window.location.href = '/esqueci-senha' // ajuste a rota se necessário
   }
 
   return (
@@ -59,15 +63,31 @@ export default function LoginPage() {
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-2">
           <label className="block mb-1 text-gray-700">Senha</label>
           <input
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-[#007cb2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#007cb2]"
+            className={`w-full px-4 py-2 border ${
+              errorMessage ? 'border-red-500' : 'border-[#007cb2]'
+            } rounded-lg focus:outline-none focus:ring-2 ${
+              errorMessage ? 'focus:ring-red-500' : 'focus:ring-[#007cb2]'
+            }`}
             placeholder="********"
           />
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+          )}
+        </div>
+
+        <div className="text-right mb-6">
+          <button
+            onClick={handleForgotPassword}
+            className="text-sm text-[#007cb2] hover:underline"
+          >
+            Esqueci minha senha
+          </button>
         </div>
 
         <button

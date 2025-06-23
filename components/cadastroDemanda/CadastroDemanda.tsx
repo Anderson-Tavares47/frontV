@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
-import { registrarDemanda, getProximoProtocolo } from './action'
+import { registrarDemanda, getProximoProtocolo, getSetores } from './action'
 import { getToken, parseJwt } from '../../utils/auth'
 
 interface CadastroDemandaProps {
@@ -11,17 +11,17 @@ interface CadastroDemandaProps {
   onDemandaCadastrada?: () => Promise<void> | void
 }
 
-
 export default function NovaDemandaPage({ setShowCreateForm, editData, onDemandaCadastrada }: CadastroDemandaProps) {
   const [focusedSelect, setFocusedSelect] = useState('')
   const [obs, setObs] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
+  const [setoresOptions, setSetoresOptions] = useState<string[]>([])
   const [form, setForm] = useState<any>({
     protocolo: '',
     setor: '',
     prioridade: 'P0',
     status: 'Pendente',
-    dataSolicitacao: getCurrentDate(), // Data atual como padrão
+    dataSolicitacao: getCurrentDate(),
     dataTermino: '',
     solicitant: '',
     meioSolicitacao: 'WhatsApp',
@@ -33,17 +33,13 @@ export default function NovaDemandaPage({ setShowCreateForm, editData, onDemanda
     solicitantId: null
   })
 
-    // Função para pegar a data atual no formato correto
-function getCurrentDate() {
-  const today = new Date().toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-  })
-
-  
-
-  const [day, month, year] = today.split('/')
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-}
+  function getCurrentDate() {
+    const today = new Date().toLocaleDateString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+    })
+    const [day, month, year] = today.split('/')
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
 
   const token = getToken()
   if (!token) {
@@ -82,6 +78,23 @@ function getCurrentDate() {
     }
   }, [editData])
 
+  useEffect(() => {
+    const loadSetores = async () => {
+      try {
+        const res = await getSetores(token)
+        const formatarSetor = (nome: string) =>
+          nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase()
+
+        const nomes = res.map((s: any) => formatarSetor(s.setor || ''))
+        setSetoresOptions(['Selecione', ...nomes])
+      } catch (err) {
+        console.error('Erro ao carregar setores:', err)
+      }
+    }
+    loadSetores()
+  }, [])
+
+
   const mapEnumToDisplay = (value: string) => {
     const mappings: Record<string, string> = {
       'N_o': 'Não',
@@ -110,14 +123,14 @@ function getCurrentDate() {
           form.status === 'Aguardando Retorno'
             ? 'Aguardando_Retorno'
             : form.status === 'Concluída'
-            ? 'Conclu_da'
-            : form.status,
+              ? 'Conclu_da'
+              : form.status,
       }
       await registrarDemanda(payload, token, isAdmin)
 
       if (onDemandaCadastrada) {
-      await onDemandaCadastrada()
-    } 
+        await onDemandaCadastrada()
+      }
 
       setShowCreateForm(false)
     } catch (error) {
@@ -135,9 +148,8 @@ function getCurrentDate() {
         onFocus={() => setFocusedSelect(name)}
         onBlur={() => setFocusedSelect('')}
         disabled={disabled}
-        className={`w-full appearance-none border border-[#007cb2] rounded px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-[#007cb2] ${
-          disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-800'
-        }`}
+        className={`w-full appearance-none border border-[#007cb2] rounded px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-[#007cb2] ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-800'
+          }`}
       >
         {options.map(opt => (
           <option key={opt} value={opt === 'Selecione' ? '' : opt}>
@@ -146,9 +158,8 @@ function getCurrentDate() {
         ))}
       </select>
       <FaChevronDown
-        className={`absolute right-3 top-3.5 pointer-events-none transition-transform duration-200 ${
-          focusedSelect === name ? 'rotate-180' : ''
-        } ${disabled ? 'text-gray-400' : 'text-[#007cb2]'}`}
+        className={`absolute right-3 top-3.5 pointer-events-none transition-transform duration-200 ${focusedSelect === name ? 'rotate-180' : ''
+          } ${disabled ? 'text-gray-400' : 'text-[#007cb2]'}`}
         size={14}
       />
     </div>
@@ -162,9 +173,8 @@ function getCurrentDate() {
       onChange={handleChange}
       readOnly={readOnly}
       disabled={disabled}
-      className={`w-full border border-[#007cb2] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] ${
-        disabled || readOnly ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-800'
-      }`}
+      className={`w-full border border-[#007cb2] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#007cb2] ${disabled || readOnly ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-800'
+        }`}
     />
   )
 
@@ -178,7 +188,7 @@ function getCurrentDate() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="text-sm font-medium block mb-1">Setor:</label>
-              {renderSelect('setor', form.setor, ['Selecione', 'FINANCEIRO', 'SUPORTE', 'EMPREGABILIDADE', 'DEMANDAS', 'Animal', 'Saúde', 'Educação', 'Cadastro Eleitoral', 'Esportes', 'Abastecimento de Água Zona Rural', 'Primeiro Título', 'Transferência de Título', 'Saneamento'])}
+              {renderSelect('setor', form.setor, setoresOptions)}
             </div>
             <div>
               <label className="text-sm font-medium block mb-1">Prioridade:</label>
@@ -234,28 +244,28 @@ function getCurrentDate() {
 
           <div className="mt-6">
             <label className="text-sm font-medium block mb-1">Observações:</label>
-            <textarea 
-              name="observacoes" 
-              maxLength={300} 
-              rows={4} 
-              value={form.observacoes} 
-              onChange={handleChange} 
-              className="w-full border border-[#007cb2] rounded px-3 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#007cb2]" 
-              placeholder="Digite aqui..." 
+            <textarea
+              name="observacoes"
+              maxLength={300}
+              rows={4}
+              value={form.observacoes}
+              onChange={handleChange}
+              className="w-full border border-[#007cb2] rounded px-3 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#007cb2]"
+              placeholder="Digite aqui..."
             />
             <div className="text-right text-sm text-gray-500">{obs.length}/300 caracteres</div>
           </div>
         </div>
 
         <div className="flex justify-end gap-4">
-          <button 
-            onClick={() => setShowCreateForm(false)} 
+          <button
+            onClick={() => setShowCreateForm(false)}
             className="bg-gray-100 border border-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-200 transition"
           >
             Voltar
           </button>
-          <button 
-            onClick={handleSubmit} 
+          <button
+            onClick={handleSubmit}
             className="bg-[#007cb2] text-white px-6 py-2 rounded hover:bg-[#00689c] transition"
           >
             Gravar

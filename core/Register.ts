@@ -18,7 +18,8 @@ export interface SolicitanteData {
   secaoEleitoral?: string
 }
 
-interface LoginResponse {
+// Tipos para as respostas
+interface LoginSuccessResponse {
   message: string
   solicitante: {
     id: number
@@ -32,7 +33,14 @@ interface LoginResponse {
   token: string
 }
 
-export async function registrarSolicitante(data: SolicitanteData): Promise<LoginResponse> {
+interface LoginErrorResponse {
+  error: true
+  message: string
+}
+
+export type LoginResponse = LoginSuccessResponse | LoginErrorResponse
+
+export async function registrarSolicitante(data: SolicitanteData): Promise<LoginSuccessResponse> {
   try {
     const response = await fetch(`${BASE_URL}/solicitantes/register`, {
       method: 'POST',
@@ -71,9 +79,9 @@ export async function loginSolicitante({
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ email, senha }),
-    });
+    })
 
-    const json = await response.json();
+    const json = await response.json()
     
     if (!response.ok) {
       // Trata especificamente o caso de senha incorreta
@@ -81,27 +89,26 @@ export async function loginSolicitante({
         return {
           error: true,
           message: json.message
-        };
+        }
       }
       // Outros erros
       return {
         error: true,
         message: json.message || json.error || 'Credenciais inválidas'
-      };
+      }
     }
     
-    return json as LoginResponseSuccess;
+    return json as LoginSuccessResponse
   } catch (err: any) {
-    console.error('Erro no login:', err);
+    console.error('Erro no login:', err)
     return {
       error: true,
       message: 'Erro ao conectar com o servidor'
-    };
+    }
   }
 }
 
-
-export async function updateSolicitante(id: number, data: any) {
+export async function updateSolicitante(id: number, data: any): Promise<any> {
   try {
     const response = await fetch(`${BASE_URL}/solicitantes/${id}`, {
       method: 'PUT',

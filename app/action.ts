@@ -8,5 +8,8 @@ interface LoginData {
 }
 
 export async function loginSolicitante(data: LoginData) {
-  return Register.loginSolicitante(data)
+  const result = await Register.loginSolicitante(data)
+
+  // Retorna diretamente, seja sucesso ou erro
+  return result
 }

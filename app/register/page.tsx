@@ -247,8 +247,7 @@ export default function RegistroPage() {
               ['Endereço:', 'endereco'],
               ['Número:', 'numero'],
               ['Bairro:', 'bairro'],
-              ['Ponto Referência:', 'pontoReferencia'],
-              ['Seção Eleitoral:', 'secao']
+              ['Ponto Referência:', 'pontoReferencia']
             ].map(([label, name]) => (
               <div key={name}>
                 <label className="text-sm font-medium">{label}</label>

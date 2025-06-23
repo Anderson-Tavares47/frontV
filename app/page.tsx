@@ -24,15 +24,15 @@ const handleLogin = async () => {
     const response = await loginSolicitante({ email, senha: password });
 
     // Verifique se a resposta é um erro
-    if ('error' in response && response.error) {
+    if ('error' in response) {
       setPassword('');
       setErrorMessage(response.message);
       return;
     }
 
-    // Se não for erro, trata como sucesso
-    localStorage.setItem('token', response?.token);
-    localStorage.setItem('solicitante', JSON.stringify(response?.solicitante));
+    // Agora o TypeScript sabe que response é do tipo LoginSuccessResponse
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('solicitante', JSON.stringify(response.solicitante));
     router.push('/dashboard');
   } catch (err: any) {
     setPassword('');

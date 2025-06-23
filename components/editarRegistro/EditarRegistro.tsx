@@ -102,7 +102,8 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
               ['*CPF:', 'cpf'],
               ['Título de Eleitor:', 'titulo'],
               ['*Telefone:', 'telefone'],
-              ['*E-mail:', 'email']
+              ['*E-mail:', 'email'],
+              ['Seção Eleitoral:', 'secao']
             ].map(([label, name]) => (
               <div key={name}>
                 <label className="text-sm font-medium">{label}</label>
@@ -126,8 +127,7 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
               ['Endereço:', 'endereco'],
               ['Número:', 'numero'],
               ['Bairro:', 'bairro'],
-              ['Ponto Referência:', 'pontoReferencia'],
-              ['Seção Eleitoral:', 'secao']
+              ['Ponto Referência:', 'pontoReferencia']
             ].map(([label, name]) => (
               <div key={name}>
                 <label className="text-sm font-medium">{label}</label>

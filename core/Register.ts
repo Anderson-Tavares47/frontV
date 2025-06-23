@@ -71,22 +71,27 @@ export async function loginSolicitante({
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ email, senha }),
-    })
+    });
 
-    const json = await response.json()
+    const json = await response.json();
 
     if (!response.ok) {
-      const message = json?.message || json?.error || 'Credenciais inválidas'
-      throw new Error(message)
+      // Captura o erro corretamente para o front
+      const message = json?.message || json?.error || 'Erro ao fazer login';
+      throw new Error(message);
     }
 
-    return json
-  } catch (err) {
-    console.error('Erro no login:', err)
-    if (err instanceof Error) throw new Error(err.message)
-    throw new Error('Erro inesperado no login')
+    return {
+      message: json.message,
+      token: json.token,
+      solicitante: json.usuario // ← o frontend espera "solicitante"
+    };
+  } catch (err: any) {
+    console.error('[CORE] Erro no loginSolicitante:', err.message);
+    throw new Error(err.message || 'Erro desconhecido no login');
   }
 }
+
 
 export async function updateSolicitante(id: number, data: any) {
   try {

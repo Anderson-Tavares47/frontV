@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
- const handleLogin = async () => {
+const handleLogin = async () => {
   if (!email || !password) {
     setErrorMessage('Preencha todos os campos!');
     return;
@@ -23,19 +23,20 @@ export default function LoginPage() {
   try {
     const response = await loginSolicitante({ email, senha: password });
 
-    // Verifique se a resposta contém erro
-    if (response?.error) {
+    // Verifique se a resposta é um erro
+    if ('error' in response && response.error) {
       setPassword('');
       setErrorMessage(response.message);
       return;
     }
 
+    // Se não for erro, trata como sucesso
     localStorage.setItem('token', response.token);
     localStorage.setItem('solicitante', JSON.stringify(response.solicitante));
     router.push('/dashboard');
   } catch (err: any) {
     setPassword('');
-    setErrorMessage(err?.message || 'Erro ao tentar login. Verifique suas credenciais.');
+    setErrorMessage('Erro inesperado ao tentar login.');
   } finally {
     setLoading(false);
   }

@@ -31,8 +31,8 @@ const handleLogin = async () => {
     }
 
     // Se não for erro, trata como sucesso
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('solicitante', JSON.stringify(response.solicitante));
+    localStorage.setItem('token', response?.token);
+    localStorage.setItem('solicitante', JSON.stringify(response?.solicitante));
     router.push('/dashboard');
   } catch (err: any) {
     setPassword('');

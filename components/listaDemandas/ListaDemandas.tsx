@@ -11,6 +11,13 @@ import autoTable, { UserOptions } from 'jspdf-autotable'
 
 const ITEMS_PER_PAGE = 20
 
+const StatusDemandaEnum: Record<string, string> = {
+  Aguardando_Retorno: 'Aguardando Retorno',
+  Conclu_da: 'Concluída',
+  Pendente: 'Pendente',
+  Cancelada: 'Cancelada',
+}
+
 export default function ListaDemandas() {
   const [search, setSearch] = useState('')
   const [dateRange, setDateRange] = useState({ start: '', end: '' })
@@ -62,7 +69,6 @@ export default function ListaDemandas() {
       const searchMatch = nome.includes(search.toLowerCase()) || solicitante.includes(search.toLowerCase())
       const statusMatch = statusFilter === 'Todos' || item.status === statusFilter
 
-      // Filtro por período
       let dateMatch = true
       if (dateRange.start || dateRange.end) {
         const itemDate = new Date(item.dataSolicitacao)
@@ -105,14 +111,13 @@ export default function ListaDemandas() {
     }
   }
 
-  // Exportar para Excel
   const exportToExcel = () => {
     const dataToExport = filteredData.map(item => ({
       Protocolo: item.protocolo,
       Nome: item.solicitantes?.nomeCompleto || '-',
       Contato: item.solicitantes?.telefoneContato || '-',
       Prioridade: item.prioridade,
-      Status: item.status,
+      Status: StatusDemandaEnum[item.status] || item.status,
       'Data Solicitação': item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-',
       Setor: item.setor || '-',
       'Meio de Solicitação': item.meioSolicitacao || '-'
@@ -124,7 +129,6 @@ export default function ListaDemandas() {
     writeFile(workbook, 'demandas.xlsx')
   }
 
-  // Exportar para PDF
   const exportToPDF = () => {
     const doc = new jsPDF()
     const title = 'Relatório de Demandas'
@@ -138,11 +142,10 @@ export default function ListaDemandas() {
       item.solicitantes?.nomeCompleto || '-',
       item.solicitantes?.telefoneContato || '-',
       item.prioridade,
-      item.status,
+      StatusDemandaEnum[item.status] || item.status,
       item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'
     ])
 
-    // Configuração com tipagem correta
     const tableConfig: UserOptions = {
       head: headers,
       body: data,
@@ -197,9 +200,9 @@ export default function ListaDemandas() {
             >
               <option value="Todos">Todos</option>
               <option value="Pendente">Pendente</option>
-              <option value="Aguardando Retorno">Aguardando Retorno</option>
+              <option value="Aguardando_Retorno">Aguardando Retorno</option>
+              <option value="Conclu_da">Concluída</option>
               <option value="Cancelada">Cancelada</option>
-              <option value="Concluída">Concluída</option>
             </select>
             <FaChevronDown
               className={`absolute right-3 top-3.5 text-[#007cb2] pointer-events-none transition-transform duration-200 ${focusedSelect === 'status' ? 'rotate-180' : ''}`}
@@ -253,7 +256,6 @@ export default function ListaDemandas() {
               Novo
             </button>
           )}
-
         </div>
       </div>
 
@@ -273,14 +275,12 @@ export default function ListaDemandas() {
           <tbody>
             {paginatedData.map(item => (
               <tr key={item.id} className="even:bg-[#c4f9ff]">
-                <td className="px-4 py-3 text-gray-700">{item.status}</td>
+                <td className="px-4 py-3 text-gray-700">{StatusDemandaEnum[item.status] || item.status}</td>
                 <td className="px-4 py-3 text-gray-700">{item.protocolo}</td>
                 <td className="px-4 py-3 text-gray-800 font-medium">{item.solicitantes?.nomeCompleto || '-'}</td>
                 <td className="px-4 py-3 text-gray-700">{item.solicitantes?.telefoneContato || '-'}</td>
                 <td className="px-4 py-3 text-gray-700">{item.prioridade}</td>
-                <td className="px-4 py-3 text-gray-700">
-                  {item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'}
-                </td>
+                <td className="px-4 py-3 text-gray-700">{item.dataSolicitacao ? new Date(item.dataSolicitacao).toLocaleDateString('pt-BR') : '-'}</td>
                 <td className="px-4 py-3 text-center space-x-3">
                   <button
                     className="text-[#007cb2] hover:underline"

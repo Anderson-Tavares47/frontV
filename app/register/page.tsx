@@ -159,26 +159,84 @@ export default function RegistroPage() {
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Dados Pessoal</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              ['*Nome completo:', 'nome'],
-              ['*CPF:', 'cpf'],
-              ['Título de Eleitor:', 'titulo'],
-              ['*Telefone:', 'telefone'],
-              ['*E-mail:', 'email'],
-              ['*Senha:', 'senha']
-            ].map(([label, name]) => (
-              <div key={name}>
-                <label className="text-sm font-medium">{label}</label>
-                <input
-                  type={name === 'senha' ? 'password' : 'text'}
-                  name={name}
-                  value={form[name as keyof typeof form]}
-                  onChange={handleChange}
-                  className={`w-full border ${isError(name) ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
-                />
-              </div>
-            ))}
+            <div>
+              <label className="text-sm font-medium">*Nome completo:</label>
+              <input
+                type="text"
+                name="nome"
+                value={form.nome}
+                onChange={handleChange}
+                className={`w-full border ${isError('nome') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">*CPF:</label>
+              <input
+                type="text"
+                name="cpf"
+                value={form.cpf}
+                onChange={handleChange}
+                className={`w-full border ${isError('cpf') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Título de Eleitor:</label>
+              <input
+                type="text"
+                name="titulo"
+                value={form.titulo}
+                onChange={handleChange}
+                className={`w-full border ${isError('titulo') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Seção Eleitoral:</label>
+              <input
+                type="text"
+                name="secao"
+                value={form.secao}
+                onChange={handleChange}
+                className={`w-full border ${isError('secao') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">*Telefone:</label>
+              <input
+                type="text"
+                name="telefone"
+                value={form.telefone}
+                onChange={handleChange}
+                className={`w-full border ${isError('telefone') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">*E-mail:</label>
+              <input
+                type="text"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className={`w-full border ${isError('email') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">*Senha:</label>
+              <input
+                type="password"
+                name="senha"
+                value={form.senha}
+                onChange={handleChange}
+                className={`w-full border ${isError('senha') ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
+              />
+            </div>
           </div>
+
         </div>
 
         <div className="mb-4">

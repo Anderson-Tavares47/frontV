@@ -11,33 +11,35 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      setErrorMessage('Preencha todos os campos!')
-      return
-    }
-
-    setLoading(true)
-    setErrorMessage('')
-
-    try {
-      const response = await loginSolicitante({ email, senha: password })
-
-      localStorage.setItem('token', response.token)
-      localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
-
-      router.push('/dashboard')
-    } catch (err: any) {
-      setPassword('') // limpa a senha ao errar
-      if (err?.message) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('Erro ao tentar login. Verifique suas credenciais.')
-      }
-    } finally {
-      setLoading(false)
-    }
+ const handleLogin = async () => {
+  if (!email || !password) {
+    setErrorMessage('Preencha todos os campos!');
+    return;
   }
+
+  setLoading(true);
+  setErrorMessage('');
+
+  try {
+    const response = await loginSolicitante({ email, senha: password });
+
+    // Verifique se a resposta contém erro
+    if (response?.error) {
+      setPassword('');
+      setErrorMessage(response.message);
+      return;
+    }
+
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('solicitante', JSON.stringify(response.solicitante));
+    router.push('/dashboard');
+  } catch (err: any) {
+    setPassword('');
+    setErrorMessage(err?.message || 'Erro ao tentar login. Verifique suas credenciais.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleRegisterRedirect = () => {
     window.location.href = '/register'

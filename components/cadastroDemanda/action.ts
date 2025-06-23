@@ -14,4 +14,6 @@ export async function getProximoProtocolo(token:string) {
   return Demanda.getProximoProtocolo(token)
 }
 
-
+export async function getSetores(token: string) {
+  return await Demanda.listarSetores(token)
+}

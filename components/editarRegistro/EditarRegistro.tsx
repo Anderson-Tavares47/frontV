@@ -10,8 +10,37 @@ interface EditarRegistroProps {
   setClose: () => void
 }
 
+function isValidCPF(cpf: string) {
+  cpf = cpf.replace(/[^\d]+/g, '')
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i)) * (10 - i)
+  let rev = 11 - (sum % 11)
+  if (rev >= 10) rev = 0
+  if (rev !== parseInt(cpf.charAt(9))) return false
+  sum = 0
+  for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i)) * (11 - i)
+  rev = 11 - (sum % 11)
+  if (rev >= 10) rev = 0
+  return rev === parseInt(cpf.charAt(10))
+}
+
+function maskCPF(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+    .slice(0, 14)
+}
+
+function maskCEP(value: string) {
+  return value.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9)
+}
+
 export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
   const [focused, setFocused] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
 
   const [form, setForm] = useState({
     nome: '',
@@ -28,18 +57,15 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
     secao: ''
   })
 
-  const [errors, setErrors] = useState<string[]>([])
-
-  // Carregar dados do item no form ao abrir
   useEffect(() => {
     if (item) {
       setForm({
         nome: item.nomeCompleto || '',
-        cpf: item.cpf || '',
+        cpf: maskCPF(item.cpf || ''),
         titulo: item.titulo || '',
         telefone: item.telefoneContato || '',
         email: item.email || '',
-        cep: item.cep || '',
+        cep: maskCEP(item.cep || ''),
         endereco: item.endereco || '',
         numero: item.num || '',
         bairro: item.bairro || '',
@@ -50,21 +76,63 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
     }
   }, [item])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    let newValue = value
+
+    if (name === 'cpf') newValue = maskCPF(value)
+    if (name === 'cep') newValue = maskCEP(value)
+
+    if (name === 'cep') {
+      const cleanCep = newValue.replace(/\D/g, '')
+      setForm(prev => ({ ...prev, cep: newValue }))
+
+      if (cleanCep.length === 8) {
+        try {
+          const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+          const data = await res.json()
+          if (!data.erro) {
+            setForm(prev => ({
+              ...prev,
+              endereco: data.logradouro || '',
+              bairro: data.bairro || ''
+            }))
+          }
+        } catch (err) {
+          console.error('Erro ao buscar CEP:', err)
+        }
+      }
+    } else {
+      setForm(prev => ({ ...prev, [name]: newValue }))
+    }
   }
 
-  const token = getToken();
-
+  const token = getToken()
   if (!token) {
-  console.error('Sessão expirada. Faça login novamente.');
-  return;
-}
+    console.error('Sessão expirada. Faça login novamente.')
+    return null
+  }
 
   const handleSubmit = async () => {
+    const camposObrigatorios: (keyof typeof form)[] = ['nome', 'cpf', 'telefone', 'email']
+    const faltando = camposObrigatorios.filter(campo => !form[campo].trim())
+
+    if (faltando.length > 0) {
+      setErrors(faltando)
+      alert('Preencha todos os campos obrigatórios.')
+      return
+    }
+
+    if (!isValidCPF(form.cpf)) {
+      alert('CPF inválido.')
+      return
+    }
+
+    setErrors([])
+
     const payload = {
       nomeCompleto: form.nome,
-      cpf: form.cpf,
+      cpf: form.cpf.replace(/\D/g, ''),
       titulo: form.titulo,
       telefoneContato: form.telefone,
       email: form.email,
@@ -88,28 +156,37 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
 
   const isError = (campo: string) => errors.includes(campo)
 
+  const camposPessoais = [
+    ['*Nome completo:', 'nome'],
+    ['*CPF:', 'cpf'],
+    ['Título de Eleitor:', 'titulo'],
+    ['*Telefone:', 'telefone'],
+    ['*E-mail:', 'email'],
+    ['Seção Eleitoral:', 'secao']
+  ] as const
+
+  const camposEndereco = [
+    ['Cep:', 'cep'],
+    ['Endereço:', 'endereco'],
+    ['Número:', 'numero'],
+    ['Bairro:', 'bairro'],
+    ['Ponto Referência:', 'pontoReferencia']
+  ] as const
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-[#b5e4f1] px-4 py-8">
       <div className="bg-white w-full max-w-4xl p-6 rounded-xl shadow-lg">
         <h2 className="text-xl font-bold text-[#007cb2] border-b border-black pb-1 mb-4">Solicitante</h2>
 
-        {/* DADOS PESSOAIS */}
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Dados Pessoais</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              ['*Nome completo:', 'nome'],
-              ['*CPF:', 'cpf'],
-              ['Título de Eleitor:', 'titulo'],
-              ['*Telefone:', 'telefone'],
-              ['*E-mail:', 'email'],
-              ['Seção Eleitoral:', 'secao']
-            ].map(([label, name]) => (
+            {camposPessoais.map(([label, name]) => (
               <div key={name}>
                 <label className="text-sm font-medium">{label}</label>
                 <input
                   name={name}
-                  value={form[name as keyof typeof form]}
+                  value={form[name]}
                   onChange={handleChange}
                   className={`w-full border ${isError(name) ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
                 />
@@ -118,22 +195,15 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
           </div>
         </div>
 
-        {/* ENDEREÇO */}
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Endereço</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              ['Cep:', 'cep'],
-              ['Endereço:', 'endereco'],
-              ['Número:', 'numero'],
-              ['Bairro:', 'bairro'],
-              ['Ponto Referência:', 'pontoReferencia']
-            ].map(([label, name]) => (
+            {camposEndereco.map(([label, name]) => (
               <div key={name}>
                 <label className="text-sm font-medium">{label}</label>
                 <input
                   name={name}
-                  value={form[name as keyof typeof form]}
+                  value={form[name]}
                   onChange={handleChange}
                   className={`w-full border ${isError(name) ? 'border-red-500' : 'border-[#007cb2]'} rounded px-2 py-1 focus:ring-2 focus:ring-[#007cb2] focus:outline-none`}
                 />
@@ -163,7 +233,6 @@ export default function RegistroPage({ item, setClose }: EditarRegistroProps) {
           </div>
         </div>
 
-        {/* BOTÕES */}
         <div className="flex justify-end gap-4">
           <button
             onClick={setClose}

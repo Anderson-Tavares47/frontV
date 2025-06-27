@@ -41,6 +41,15 @@ export default function NovaDemandaPage({ setShowCreateForm, editData, onDemanda
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
   }
 
+   function formatToLocalDate(isoDate: string) {
+  if (!isoDate) return ''
+  const date = new Date(isoDate)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
   const token = getToken()
   if (!token) {
     console.error('Sessão expirada. Faça login novamente.')
@@ -59,7 +68,7 @@ export default function NovaDemandaPage({ setShowCreateForm, editData, onDemanda
         setor: editData.setor || '',
         prioridade: editData.prioridade || 'P0',
         status: editData.status || 'Pendente',
-        dataSolicitacao: editData.dataSolicitacao?.split('T')[0] || getCurrentDate(),
+        dataSolicitacao: formatToLocalDate(editData.dataSolicitacao) || getCurrentDate(),
         dataTermino: editData.dataTermino?.split('T')[0] || '',
         solicitant: editData.solicitant || '',
         meioSolicitacao: editData.meioSolicitacao || 'WhatsApp',

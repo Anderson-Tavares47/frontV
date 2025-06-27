@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [adminOpen, setAdminOpen] = useState(false)
   const [activePage, setActivePage] = useState('Lista Demandas')
   const [isAdmin, setIsAdmin] = useState(false)
+  const [userName, setUserName] = useState('')
 
   const router = useRouter()
 
@@ -28,11 +29,13 @@ export default function DashboardPage() {
 
     try {
       const decoded: any = jwtDecode(token)
-      if (!decoded || !decoded.adm) {
-        setIsAdmin(false)
-      } else {
-        setIsAdmin(true)
+      if (!decoded) {
+        router.push('/')
+        return
       }
+
+      setIsAdmin(decoded?.adm === true)
+      setUserName(decoded?.nome || '')
     } catch (err) {
       console.error('Erro ao decodificar token:', err)
       router.push('/')
@@ -41,7 +44,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('solicitante') // se usado
+    localStorage.removeItem('solicitante')
     router.push('/')
   }
 
@@ -73,7 +76,6 @@ export default function DashboardPage() {
             </button>
           ))}
 
-          {/* Administrativo (somente se for admin) */}
           {isAdmin && (
             <>
               <button
@@ -102,6 +104,14 @@ export default function DashboardPage() {
             </>
           )}
         </nav>
+
+        {/* Rodapé da sidebar com nome do usuário */}
+        {userName && sidebarOpen && (
+          <div className="mt-auto p-4 text-sm text-white opacity-80">
+            Logado como: <br />
+            <span className="font-semibold">{userName}</span>
+          </div>
+        )}
       </aside>
 
       {/* Main content area */}

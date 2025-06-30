@@ -16,6 +16,7 @@ import imagem10 from "../assets/img/IMG_8429.jpg";
 import imagem11 from "../assets/img/palank.jpeg";
 
 export default function RenatoLyraHomePage() {
+  
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {

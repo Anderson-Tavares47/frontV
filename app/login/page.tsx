@@ -11,38 +11,36 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      setErrorMessage('Preencha todos os campos!')
-      return
+  const handleLogin = async () => {Add commentMore actions
+  if (!email || !password) {
+    setErrorMessage('Preencha todos os campos!');
+    return;
+  }
+
+  setLoading(true);
+  setErrorMessage('');
+
+  try {
+    const response = await loginSolicitante({ email, senha: password });
+
+    // Verifique se a resposta é um erro
+    if ('error' in response) {
+      setPassword('');
+      setErrorMessage(response.message);
+      return;
     }
 
-    setLoading(true)
-    setErrorMessage('')
-
-    try {
-  const response = await loginSolicitante({ email, senha: password })
-
-  // ✅ checagem se o response tem token e solicitante
-  if ('token' in response && 'solicitante' in response) {
-    localStorage.setItem('token', response.token)
-    localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
-    router.push('/dashboard')
-  } else {
-    // Se a resposta não for válida, trata como erro
-    throw new Error('Credenciais inválidas. Tente novamente.')
+    // Agora o TypeScript sabe que response é do tipo LoginSuccessResponse
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('solicitante', JSON.stringify(response.solicitante));
+    router.push('/dashboard');
+  } catch (err: any) {
+    setPassword('');
+    setErrorMessage('Erro inesperado ao tentar login.');
+  } finally {
+    setLoading(false);
   }
-} catch (err: any) {
-  setPassword('')
-  if (err?.message) {
-    setErrorMessage(err.message)
-  } else {
-    setErrorMessage('Erro ao tentar login. Verifique suas credenciais.')
-  }
-} finally {
-  setLoading(false)
-}
-  }
+};
 
   const handleRegisterRedirect = () => {
     window.location.href = '/register'

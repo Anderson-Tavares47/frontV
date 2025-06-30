@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import Image from 'next/image';
-import Logo from '../assets/img/novoLogo.png';
+import Logo from '../assets/img/LogoN.png';
 import Imagem1 from '../assets/img/pet.jpeg';
 import Imagem2 from '../assets/img/IMG_1725.png';
 import imagem3 from "../assets/img/IMG_8434.jpg";

@@ -13,6 +13,7 @@ import imagem7 from "../assets/img/fala.jpeg";
 import imagem8 from "../assets/img/comunidade.jpeg";
 import imagem9 from "../assets/img/diploma.jpeg";
 import imagem10 from "../assets/img/IMG_8429.jpg";
+import imagem11 from "../assets/img/palank.jpeg";
 
 export default function RenatoLyraHomePage() {
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -48,13 +49,13 @@ export default function RenatoLyraHomePage() {
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="w-full h-auto rounded-xl overflow-hidden shadow-md">
             <Image
-              src={imagem7}
+              src={imagem11}
               alt="Renato Lyra em ação"
               className="w-full h-auto object-cover rounded-xl"
               placeholder="blur"
             />
           </div>
-          <div>
+          <div className="text-justify">
             <h3 className="text-2xl font-bold mb-4 text-[#007cb2]">Quem é Renato Lyra</h3>
             <p className="text-lg leading-relaxed text-gray-800">
               Renato Lyra é vereador de Caruaru e um defensor incansável das causas que impactam diretamente a vida das pessoas.
@@ -74,7 +75,7 @@ export default function RenatoLyraHomePage() {
       {/* Serviços */}
       <section id="servicos" className="py-12 px-4 bg-gray-100">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center min-h-[500px]">
-          <div className="flex flex-col justify-center h-full">
+          <div className="flex flex-col justify-center h-full text-justify">
             <h3 className="text-2xl font-bold text-[#007cb2] mb-4">Serviços</h3>
             <p className="text-lg text-gray-700 mb-4">
               Nosso mandato é pautado pelo compromisso com as causas que realmente importam. Dedicamos atenção especial aos <strong>cuidados com os animais</strong>, promovendo ações de bem-estar, acolhimento e atendimento veterinário. Também valorizamos profundamente a <strong>educação</strong>, investindo em iniciativas que fortalecem o aprendizado e ampliam oportunidades para crianças, jovens e adultos em nossa cidade.
@@ -112,17 +113,16 @@ export default function RenatoLyraHomePage() {
           <button
             onClick={() => scroll('left')}
             className="text-3xl text-[#007cb2] bg-transparent hover:scale-110 transition-transform"
-            aria-label="Avançar"
+            aria-label="Voltar"
           >
             &lt;
           </button>
-
 
           <div
             ref={carouselRef}
             className="flex space-x-4 overflow-x-auto scroll-smooth snap-x snap-mandatory px-4 hide-scrollbar"
           >
-            {[Imagem2, imagem3, imagem4, imagem8, imagem9, imagem10].map((img, idx) => (
+            {[imagem3, imagem4, imagem8, imagem9, imagem10].map((img, idx) => (
               <div
                 key={idx}
                 className="flex-shrink-0 w-72 snap-start rounded-lg overflow-hidden shadow-md"
@@ -145,7 +145,6 @@ export default function RenatoLyraHomePage() {
           >
             &gt;
           </button>
-
         </div>
       </section>
 

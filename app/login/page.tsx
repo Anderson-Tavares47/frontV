@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
-  const handleLogin = async () => {Add commentMore actions
+  const handleLogin = async () => {
   if (!email || !password) {
     setErrorMessage('Preencha todos os campos!');
     return;

@@ -23,8 +23,8 @@ export default function LoginPage() {
     try {
       const response = await loginSolicitante({ email, senha: password })
 
-      localStorage.setItem('token', response.token)
-      localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
+      localStorage.setItem('token', response?.token)
+      localStorage.setItem('solicitante', JSON.stringify(response?.solicitante))
 
       router.push('/dashboard')
     } catch (err: any) {

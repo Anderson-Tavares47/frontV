@@ -21,22 +21,27 @@ export default function LoginPage() {
     setErrorMessage('')
 
     try {
-      const response = await loginSolicitante({ email, senha: password })
+  const response = await loginSolicitante({ email, senha: password })
 
-      localStorage.setItem('token', response?.token)
-      localStorage.setItem('solicitante', JSON.stringify(response?.solicitante))
-
-      router.push('/dashboard')
-    } catch (err: any) {
-      setPassword('') // limpa a senha ao errar
-      if (err?.message) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('Erro ao tentar login. Verifique suas credenciais.')
-      }
-    } finally {
-      setLoading(false)
-    }
+  // ✅ checagem se o response tem token e solicitante
+  if ('token' in response && 'solicitante' in response) {
+    localStorage.setItem('token', response.token)
+    localStorage.setItem('solicitante', JSON.stringify(response.solicitante))
+    router.push('/dashboard')
+  } else {
+    // Se a resposta não for válida, trata como erro
+    throw new Error('Credenciais inválidas. Tente novamente.')
+  }
+} catch (err: any) {
+  setPassword('')
+  if (err?.message) {
+    setErrorMessage(err.message)
+  } else {
+    setErrorMessage('Erro ao tentar login. Verifique suas credenciais.')
+  }
+} finally {
+  setLoading(false)
+}
   }
 
   const handleRegisterRedirect = () => {

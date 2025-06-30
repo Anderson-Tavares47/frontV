@@ -59,15 +59,11 @@ export default function RenatoLyraHomePage() {
           <div className="text-justify">
             <h3 className="text-2xl font-bold mb-4 text-[#007cb2]">Quem é Renato Lyra</h3>
             <p className="text-lg leading-relaxed text-gray-800">
-              Renato Lyra é vereador de Caruaru e um defensor incansável das causas que impactam diretamente a vida das pessoas.
-              Com uma trajetória marcada pela proximidade com a população, ele atua com firmeza em diversas frentes, sempre guiado
-              pelo compromisso com a justiça social, a dignidade humana e o bem coletivo.
+              Renato Lyra é vereador de Caruaru e atual Secretário de Sustentabilidade e Bem-Estar Animal, com uma trajetória marcada pelo compromisso com o desenvolvimento humano, ambiental e social da cidade. Reconhecido por sua atuação firme e sensível nas causas que mais afetam a vida das pessoas, Renato é um defensor incansável dos animais, da justiça social e da preservação do meio ambiente.
               <br /><br />
-              Seu trabalho se destaca pelo olhar sensível aos <strong>bairros mais carentes</strong>, pela <strong>proteção e cuidado com os animais</strong>,
-              e pelo incentivo a <strong>políticas públicas eficazes nas áreas de saúde e educação</strong>.
-              Com empatia, escuta ativa e presença constante nas comunidades, Renato busca transformar a realidade dos caruaruenses com ações concretas e acessíveis.
+              Sua atuação se destaca pela presença constante nas comunidades, pelo olhar atento às necessidades dos bairros mais carentes, e pela promoção de políticas públicas eficazes nas áreas de saúde, educação, proteção animal e sustentabilidade. À frente da Secretaria de Sustentabilidade, tem ampliado a pauta ambiental de Caruaru, enfrentando os desafios impostos pelas mudanças climáticas com ações práticas e integradas que fortalecem a resiliência da cidade.
               <br /><br />
-              Mais do que um representante político, Renato Lyra é um elo entre as necessidades do povo e a construção de uma cidade mais justa, inclusiva e solidária.
+              Renato Lyra é mais que um representante político — é um ativista que se dedica diariamente à construção de uma Caruaru mais justa, inclusiva, sustentável e solidária. Seu trabalho conecta as necessidades reais da população com soluções acessíveis, inovadoras e humanas, fazendo da política um verdadeiro instrumento de transformação social.
             </p>
           </div>
         </div>

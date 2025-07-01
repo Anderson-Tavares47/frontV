@@ -248,14 +248,14 @@ export default function ListaDemandas() {
           >
             <FaFilePdf /> PDF
           </button>
-          {!isAdmin2 && (
+{/*           {!isAdmin2 && ( */}
             <button
               onClick={handleNew}
               className="bg-[#007cb2] text-white px-6 py-2 rounded hover:bg-[#00689c] transition"
             >
               Novo
             </button>
-          )}
+{/*           )} */}
         </div>
       </div>
 

@@ -107,3 +107,25 @@ export async function listarSetores(token: string) {
     throw error
   }
 }
+
+
+export async function listarUsuarios(token: string) {
+  try {
+    const response = await fetch(`${BASE_URL}/solicitantes`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error('Erro ao buscar usuários')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Erro em listarUsuarios:', error)
+    throw error
+  }
+}

@@ -146,9 +146,22 @@ export default function RenatoLyraHomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#007cb2] text-white py-6 text-center">
-        <p className="text-sm">© {new Date().getFullYear()} Renato Lyra. Todos os direitos reservados.</p>
-      </footer>
+        <footer className="bg-[#007cb2] text-white py-6 px-4">
+  <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 text-sm">
+    <p>© {new Date().getFullYear()} Renato Lyra. Todos os direitos reservados.</p>
+    <p>
+      Desenvolvido por{' '}
+      <a
+        href="https://solutionscompanyltda.com.br/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-gray-200 transition"
+      >
+        Solutions Company LTDA
+      </a>
+    </p>
+  </div>
+</footer>
     </div>
   );
 }
